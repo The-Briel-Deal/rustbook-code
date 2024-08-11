@@ -1,0 +1,6 @@
+[package]
+name = "chap_5_1_structs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
