@@ -1,0 +1,6 @@
+[package]
+name = "chap_3_3_how_functions_work"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
