@@ -60,15 +60,16 @@ mod tests {
     #[test]
     fn test_visualize_tree() {
         let expected = r###"
-                 R0 
-                /  \ 
-               /    \
-             S1      S2 
-            /  |    | \
-           /   |    |  \ 
-          L3   L4  S5   L6
-                  /  \
-                 L7   L8 "###;
+Root 0
+├── Split 1
+│   ├── Leaf 3
+│   └── Leaf 4
+└── Split 2
+    ├── Split 5
+    │   ├── Leaf 7
+    │   └── Leaf 8
+    └── Leaf 6
+"###;
         let result = visualize_tree(Node::Root {
             left_child: Box::new(Node::Split {
                 left_child: Box::new(Node::Leaf { index: 3 }),
