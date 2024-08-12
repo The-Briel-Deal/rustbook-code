@@ -21,7 +21,11 @@ fn main() {
             index: 1,
         }),
         right_child: Box::new(Node::Split {
-            left_child: Box::new(Node::Leaf { index: 5 }),
+            left_child: Box::new(Node::Split {
+                index: 5,
+                left_child: Box::new(Node::Leaf { index: 7 }),
+                right_child: Box::new(Node::Leaf { index: 8 }),
+            }),
             right_child: Box::new(Node::Leaf { index: 6 }),
             index: 2,
         }),
@@ -30,30 +34,37 @@ fn main() {
     let root = Box::new(root);
     let mut vec = vec![&root];
 
+    let mut string = String::from("");
     while vec.len() != 0 {
-        let node = vec.pop();
-        let node = node.expect("We already checked if the length was 0 in the loop");
-        let node = node.as_ref();
-        match node {
-            Node::Root {
-                left_child,
-                right_child,
-                index,
-            } => {
-                println!("This is root node {index}!");
-                vec.insert(0, left_child);
-                vec.insert(0, right_child);
+        let mut level_size = vec.len();
+        while level_size != 0 {
+            level_size -= 1;
+            let node = vec.pop();
+            let node = node.expect("We already checked if the length was 0 in the loop");
+            let node = node.as_ref();
+            match node {
+                Node::Root {
+                    left_child,
+                    right_child,
+                    index,
+                } => {
+                    string.push_str(&format!("R{index} "));
+                    vec.insert(0, left_child);
+                    vec.insert(0, right_child);
+                }
+                Node::Split {
+                    left_child,
+                    right_child,
+                    index,
+                } => {
+                    string.push_str(&format!("S{index} "));
+                    vec.insert(0, left_child);
+                    vec.insert(0, right_child);
+                }
+                Node::Leaf { index } => string.push_str(&format!("L{index} ")),
             }
-            Node::Split {
-                left_child,
-                right_child,
-                index,
-            } => {
-                println!("This is split node {index}!");
-                vec.insert(0, left_child);
-                vec.insert(0, right_child);
-            }
-            Node::Leaf { index } => println!("This is leaf node {index}!"),
         }
+        string.push_str("\n");
     }
+    println!("{string}");
 }
