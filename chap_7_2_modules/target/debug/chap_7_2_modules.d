@@ -1,0 +1,1 @@
+/home/gabe/Code/rustbook/chap_7_2_modules/target/debug/chap_7_2_modules: /home/gabe/Code/rustbook/chap_7_2_modules/src/example/beans.rs /home/gabe/Code/rustbook/chap_7_2_modules/src/example/mod.rs /home/gabe/Code/rustbook/chap_7_2_modules/src/main.rs /home/gabe/Code/rustbook/chap_7_2_modules/src/second_example.rs
