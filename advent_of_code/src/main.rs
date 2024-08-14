@@ -1,5 +1,5 @@
-use std::fs;
 use advent_of_code as lib;
+use std::fs;
 
 fn main() {
     let contents = fs::read_to_string("./src/day_one_input.txt").unwrap();
@@ -8,46 +8,24 @@ fn main() {
 
 fn day_one(input: String) -> u32 {
     let mut total = 0;
-    let mut new_input = input.clone();
-    let mut offset = 0;
-    for (old, new) in [
-        ("one", '1'),
-        ("two", '2'),
-        ("three", '3'),
-        ("four", '4'),
-        ("five", '5'),
-        ("six", '6'),
-        ("seven", '7'),
-        ("eight", '8'),
-        ("nine", '9'),
-    ] {
-        for (i, _j) in input.match_indices(old) {
-            new_input.insert(i+offset, new);
-            offset+=1
-        }
-    }
-    let input = new_input;
-    println!("{input}");
-    /*
-    .replace("one", "1")
-    .replace("two", "2")
-    .replace("three", "3")
-    .replace("four", "4")
-    .replace("five", "5")
-    .replace("six", "6")
-    .replace("seven", "7")
-    .replace("eight", "8")
-    .replace("nine", "9");
-    */
     for line in input.lines() {
         let mut first: Option<char> = None;
         let mut last: Option<char> = None;
-        for ch in line.chars() {
+        for (i, ch) in line.chars().enumerate() {
             if ch.is_numeric() {
                 if let None = first {
                     first = Some(ch);
                 }
                 last = Some(ch);
+            } else {
+                let num = lib::slice_starts_with_number(&line[i..]);
+                if let None = num {
+                    continue;
+                }
+                if let None = first {
+                    first = num;
+                }
+                last = num;
             }
         }
         if first.is_none() {
