@@ -1,0 +1,1 @@
+/home/gabe/Code/rustbook/chap_7_5_seperating_modules/target/debug/libchap_7_5_seperating_modules.rlib: /home/gabe/Code/rustbook/chap_7_5_seperating_modules/src/front_of_house/hosting.rs /home/gabe/Code/rustbook/chap_7_5_seperating_modules/src/front_of_house.rs /home/gabe/Code/rustbook/chap_7_5_seperating_modules/src/lib.rs
