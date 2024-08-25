@@ -33,6 +33,12 @@ pub mod blog {
             }
         }
 
+        pub fn reject(&mut self) {
+            if let Some(s) = self.state.take() {
+                self.state = Some(s.reject())
+            }
+        }
+
         pub fn approve(&mut self) {
             if let Some(s) = self.state.take() {
                 self.state = Some(s.approve())
@@ -42,6 +48,7 @@ pub mod blog {
 
     trait State {
         fn request_review(self: Box<Self>) -> Box<dyn State>;
+        fn reject(self: Box<Self>) -> Box<dyn State>;
         fn approve(self: Box<Self>) -> Box<dyn State>;
         fn content<'a>(&self, _post: &'a Post) -> &'a str {
             ""
@@ -49,27 +56,51 @@ pub mod blog {
     }
 
     struct Draft {}
-    struct PendingReview {}
+    struct PendingReview {
+        approvals: u8,
+        approvals_required: u8,
+    }
     struct Published {}
 
     impl State for Draft {
         fn request_review(self: Box<Self>) -> Box<dyn State> {
-            Box::new(PendingReview {})
+            PendingReview::new()
+        }
+        fn reject(self: Box<Self>) -> Box<dyn State> {
+            self
         }
         fn approve(self: Box<Self>) -> Box<dyn State> {
             self
+        }
+    }
+    impl PendingReview {
+        fn new() -> Box<Self> {
+            Box::new(PendingReview {
+                approvals: 0,
+                approvals_required: 2,
+            })
         }
     }
     impl State for PendingReview {
         fn request_review(self: Box<Self>) -> Box<dyn State> {
             self
         }
-        fn approve(self: Box<Self>) -> Box<dyn State> {
-            Box::new(Published {})
+        fn reject(self: Box<Self>) -> Box<dyn State> {
+            Box::new(Draft {})
+        }
+        fn approve(mut self: Box<Self>) -> Box<dyn State> {
+            self.approvals += 1;
+            if self.approvals >= self.approvals_required {
+                return Box::new(Published {});
+            }
+            self
         }
     }
     impl State for Published {
         fn request_review(self: Box<Self>) -> Box<dyn State> {
+            self
+        }
+        fn reject(self: Box<Self>) -> Box<dyn State> {
             self
         }
         fn approve(self: Box<Self>) -> Box<dyn State> {
@@ -86,7 +117,7 @@ mod blog_tests {
     use super::blog::Post;
 
     #[test]
-    fn create_and_publish_blog_post() {
+    fn create_and_publish() {
         let mut post = Post::new();
 
         post.add_text("I have a big honkin dog...");
@@ -96,6 +127,33 @@ mod blog_tests {
         assert_eq!("", post.content());
 
         post.approve();
+        assert_eq!("", post.content());
+
+        post.approve();
         assert_eq!("I have a big honkin dog...", post.content());
+    }
+    #[test]
+    fn create_and_reject() {
+        let mut post = Post::new();
+
+        post.add_text("I have a BIG OL honkin dog...");
+        assert_eq!("", post.content());
+
+        post.request_review();
+        assert_eq!("", post.content());
+
+        post.reject();
+        assert_eq!("", post.content());
+
+        post.approve();
+        assert_eq!("", post.content());
+
+        post.request_review();
+        assert_eq!("", post.content());
+
+        post.approve(); // Two approvals required.
+        assert_eq!("", post.content());
+        post.approve();
+        assert_eq!("I have a BIG OL honkin dog...", post.content());
     }
 }
