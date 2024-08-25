@@ -1,4 +1,5 @@
 pub mod blog {
+    const DEFAULT_REQUIRED_APPROVALS: u8 = 2;
     pub struct Post {
         state: Option<Box<dyn State>>,
         content: String,
@@ -77,7 +78,7 @@ pub mod blog {
         fn new() -> Box<Self> {
             Box::new(PendingReview {
                 approvals: 0,
-                approvals_required: 2,
+                approvals_required: DEFAULT_REQUIRED_APPROVALS,
             })
         }
     }
