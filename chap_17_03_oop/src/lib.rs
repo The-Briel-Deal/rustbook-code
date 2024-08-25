@@ -21,7 +21,8 @@ pub mod blog {
             }
         }
         pub fn add_text(&mut self, text: &str) {
-            self.content.push_str(text);
+            self.content
+                .push_str(self.state.as_ref().unwrap().add_text(text));
         }
 
         pub fn content(&self) -> &str {
@@ -51,6 +52,9 @@ pub mod blog {
         fn request_review(self: Box<Self>) -> Box<dyn State>;
         fn reject(self: Box<Self>) -> Box<dyn State>;
         fn approve(self: Box<Self>) -> Box<dyn State>;
+        fn add_text<'a>(&self, _text: &'a str) -> &'a str {
+            ""
+        }
         fn content<'a>(&self, _post: &'a Post) -> &'a str {
             ""
         }
@@ -64,6 +68,9 @@ pub mod blog {
     struct Published {}
 
     impl State for Draft {
+        fn add_text<'a>(&self, text: &'a str) -> &'a str {
+            text
+        }
         fn request_review(self: Box<Self>) -> Box<dyn State> {
             PendingReview::new()
         }
@@ -125,6 +132,25 @@ mod blog_tests {
         assert_eq!("", post.content());
 
         post.request_review();
+        assert_eq!("", post.content());
+
+        post.approve();
+        assert_eq!("", post.content());
+
+        post.approve();
+        assert_eq!("I have a big honkin dog...", post.content());
+    }
+    #[test]
+    fn create_and_edit_in_review() {
+        let mut post = Post::new();
+
+        post.add_text("I have a big honkin dog...");
+        assert_eq!("", post.content());
+
+        post.request_review();
+        assert_eq!("", post.content());
+
+        post.add_text("I have a HUGEEEEE honkin dog...");
         assert_eq!("", post.content());
 
         post.approve();
